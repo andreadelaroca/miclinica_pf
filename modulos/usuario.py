@@ -1,0 +1,1 @@
+# Registro, roles, login, edición, inactivación

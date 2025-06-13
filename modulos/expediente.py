@@ -1,0 +1,1 @@
+# Registro, modificación, visualización, archivo

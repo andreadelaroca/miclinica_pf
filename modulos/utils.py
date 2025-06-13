@@ -1,0 +1,1 @@
+# Funciones comunes: lectura/escritura/validación
