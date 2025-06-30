@@ -270,47 +270,69 @@ def editar_expediente(expediente_dao, medico_logueado):
         print(f"\nEditando expediente ID: {expediente.id_expediente}")
         print("(Presione Enter para mantener el valor actual)")
         
-        nuevo_diagnostico = input(f"Diagnóstico [{expediente.diagnostico}]: ").strip()
+        print("\nDIAGNÓSTICO ACTUAL:")
+        print(f"{expediente.diagnostico if expediente.diagnostico else '[Vacío]'}")
+        nuevo_diagnostico = input("\nNuevo diagnóstico: ").strip()
         if nuevo_diagnostico:
             expediente.diagnostico = nuevo_diagnostico
         
-        nuevo_tratamiento = input(f"Tratamiento [{expediente.tratamiento}]: ").strip()
+        print("\nTRATAMIENTO ACTUAL:")
+        print(f"{expediente.tratamiento if expediente.tratamiento else '[Vacío]'}")
+        nuevo_tratamiento = input("\nNuevo tratamiento: ").strip()
         if nuevo_tratamiento:
             expediente.tratamiento = nuevo_tratamiento
         
-        nuevas_observaciones = input(f"Observaciones [{expediente.observaciones}]: ").strip()
+        print("\nOBSERVACIONES ACTUALES:")
+        print(f"{expediente.observaciones if expediente.observaciones else '[Vacío]'}")
+        nuevas_observaciones = input("\nNuevas observaciones: ").strip()
         if nuevas_observaciones:
             expediente.observaciones = nuevas_observaciones
         
-        nueva_referencia = input(f"Referencias [{expediente.referencia}]: ").strip()
+        print("\nREFERENCIAS ACTUALES:")
+        print(f"{expediente.referencia if expediente.referencia else '[Vacío]'}")
+        nueva_referencia = input("\nNuevas referencias: ").strip()
         if nueva_referencia:
             expediente.referencia = nueva_referencia
         
-        nueva_contrarreferencia = input(f"Contrarreferencia [{expediente.contrarreferencia}]: ").strip()
+        print("\nCONTRARREFERENCIA ACTUAL:")
+        print(f"{expediente.contrarreferencia if expediente.contrarreferencia else '[Vacío]'}")
+        nueva_contrarreferencia = input("\nNueva contrarreferencia: ").strip()
         if nueva_contrarreferencia:
             expediente.contrarreferencia = nueva_contrarreferencia
         
-        nueva_interconsulta = input(f"Interconsulta [{expediente.interconsulta}]: ").strip()
+        print("\nINTERCONSULTA ACTUAL:")
+        print(f"{expediente.interconsulta if expediente.interconsulta else '[Vacío]'}")
+        nueva_interconsulta = input("\nNueva interconsulta: ").strip()
         if nueva_interconsulta:
             expediente.interconsulta = nueva_interconsulta
         
-        nueva_enfermeria = input(f"Enfermería [{expediente.enfermeria}]: ").strip()
+        print("\nENFERMERÍA ACTUAL:")
+        print(f"{expediente.enfermeria if expediente.enfermeria else '[Vacío]'}")
+        nueva_enfermeria = input("\nNueva enfermería: ").strip()
         if nueva_enfermeria:
             expediente.enfermeria = nueva_enfermeria
         
-        nueva_historia = input(f"Historia clínica [{expediente.historia_clinica}]: ").strip()
+        print("\nHISTORIA CLÍNICA ACTUAL:")
+        print(f"{expediente.historia_clinica if expediente.historia_clinica else '[Vacío]'}")
+        nueva_historia = input("\nNueva historia clínica: ").strip()
         if nueva_historia:
             expediente.historia_clinica = nueva_historia
         
-        nuevos_consentimientos = input(f"Consentimientos [{expediente.consentimientos}]: ").strip()
+        print("\nCONSENTIMIENTOS ACTUALES:")
+        print(f"{expediente.consentimientos if expediente.consentimientos else '[Vacío]'}")
+        nuevos_consentimientos = input("\nNuevos consentimientos: ").strip()
         if nuevos_consentimientos:
             expediente.consentimientos = nuevos_consentimientos
         
-        nueva_hoja = input(f"Hoja de identificación [{expediente.hoja_identificacion}]: ").strip()
+        print("\nHOJA DE IDENTIFICACIÓN ACTUAL:")
+        print(f"{expediente.hoja_identificacion if expediente.hoja_identificacion else '[Vacío]'}")
+        nueva_hoja = input("\nNueva hoja de identificación: ").strip()
         if nueva_hoja:
             expediente.hoja_identificacion = nueva_hoja
         
-        nuevo_reporte = input(f"Reporte de exámenes [{expediente.reporte_examenes}]: ").strip()
+        print("\nREPORTE DE EXÁMENES ACTUAL:")
+        print(f"{expediente.reporte_examenes if expediente.reporte_examenes else '[Vacío]'}")
+        nuevo_reporte = input("\nNuevo reporte de exámenes: ").strip()
         if nuevo_reporte:
             expediente.reporte_examenes = nuevo_reporte
         
@@ -668,6 +690,39 @@ def mostrar_menu_paciente():
     print("-"*40)
 
 
+def ver_expediente_detallado(expediente):
+    """Muestra un expediente médico con todos los detalles en formato ordenado"""
+    os.system('cls || clear')
+    print("\n" + "="*70)
+    print(f"    EXPEDIENTE MÉDICO - ID: {expediente.id_expediente}")
+    print("="*70)
+    
+    campos = [
+        ("ID MÉDICO", expediente.id_medico),
+        ("ID CENTRO", expediente.id_centro),
+        ("DIAGNÓSTICO", expediente.diagnostico),
+        ("TRATAMIENTO", expediente.tratamiento),
+        ("OBSERVACIONES", expediente.observaciones),
+        ("REFERENCIAS", expediente.referencia),
+        ("CONTRARREFERENCIA", expediente.contrarreferencia),
+        ("INTERCONSULTA", expediente.interconsulta),
+        ("ENFERMERÍA", expediente.enfermeria),
+        ("HISTORIA CLÍNICA", expediente.historia_clinica),
+        ("CONSENTIMIENTOS", expediente.consentimientos),
+        ("HOJA DE IDENTIFICACIÓN", expediente.hoja_identificacion),
+        ("REPORTE DE EXÁMENES", expediente.reporte_examenes)
+    ]
+    
+    for titulo, contenido in campos:
+        print(f"\n{titulo}:")
+        print(f"{contenido if contenido else '[No especificado]'}")
+        print("-" * 50)
+    
+    print(f"\nFECHA DE CREACIÓN: {expediente.fecha_creacion}")
+    print(f"FECHA DE MODIFICACIÓN: {expediente.fecha_modificacion}")
+    print("\n" + "="*70)
+
+
 def mostrar_estadisticas(file_manager, usuario_dao, expediente_dao, usuario_logueado):
     """Muestra estadísticas del centro del usuario logueado"""
     print("\n" + "="*40)
@@ -896,11 +951,26 @@ def main():
                                 expedientes = expediente_dao.buscar_expedientes(termino)
                                 if expedientes:
                                     print("\n--- RESULTADOS DE BÚSQUEDA ---")
-                                    for expediente in expedientes:
-                                        print(f"ID: {expediente.id_expediente} | Paciente: {expediente.id_paciente} | Diagnóstico: {expediente.diagnostico[:30]}...")
+                                    for i, expediente in enumerate(expedientes, 1):
+                                        print(f"{i}. ID: {expediente.id_expediente} | Paciente: {expediente.id_paciente} | Diagnóstico: {expediente.diagnostico[:50]}...")
+                                    
+                                    try:
+                                        seleccion = int(input("\nSeleccione el número del expediente para ver detalles (0 para volver): "))
+                                        if seleccion == 0:
+                                            continue
+                                        if seleccion < 1 or seleccion > len(expedientes):
+                                            print("Selección inválida.")
+                                            input("Presione Enter para continuar...")
+                                            continue
+                                        
+                                        expediente_detallado = expedientes[seleccion - 1]
+                                        ver_expediente_detallado(expediente_detallado)
+                                    except ValueError:
+                                        print("Selección inválida.")
+                                        input("Presione Enter para continuar...")
                                 else:
                                     print("No se encontraron expedientes.")
-                                input("Presione Enter para continuar...")
+                                    input("Presione Enter para continuar...")
                             elif sub_opcion == "4":
                                 # Mostrar pacientes del centro del médico
                                 pacientes = usuario_dao.obtener_pacientes_por_centro(usuario_logueado.id_centro)
@@ -926,10 +996,26 @@ def main():
                                     expedientes = expediente_dao.obtener_expedientes_por_paciente(paciente_seleccionado.id_usuario)
                                     if expedientes:
                                         print(f"\n--- EXPEDIENTES DE {paciente_seleccionado.nombre} {paciente_seleccionado.apellido} ---")
-                                        for expediente in expedientes:
-                                            print(f"ID: {expediente.id_expediente} | Médico: {expediente.id_medico} | Diagnóstico: {expediente.diagnostico}")
+                                        for i, expediente in enumerate(expedientes, 1):
+                                            print(f"{i}. ID: {expediente.id_expediente} | Médico: {expediente.id_medico} | Diagnóstico: {expediente.diagnostico[:50]}...")
+                                        
+                                        try:
+                                            exp_seleccion = int(input("\nSeleccione el número del expediente para ver detalles (0 para volver): "))
+                                            if exp_seleccion == 0:
+                                                continue
+                                            if exp_seleccion < 1 or exp_seleccion > len(expedientes):
+                                                print("Selección inválida.")
+                                                input("Presione Enter para continuar...")
+                                                continue
+                                            
+                                            expediente_detallado = expedientes[exp_seleccion - 1]
+                                            ver_expediente_detallado(expediente_detallado)
+                                        except ValueError:
+                                            print("Selección inválida.")
+                                            input("Presione Enter para continuar...")
                                     else:
                                         print("Este paciente no tiene expedientes registrados.")
+                                        input("Presione Enter para continuar...")
                                 except ValueError:
                                     print("Selección inválida.")
                                 input("Presione Enter para continuar...")
@@ -962,23 +1048,7 @@ def main():
                                             continue
                                         
                                         expediente_detallado = expedientes[seleccion - 1]
-                                        print(f"\n--- DETALLES DEL EXPEDIENTE {expediente_detallado.id_expediente} ---")
-                                        print(f"Médico: {expediente_detallado.id_medico}")
-                                        print(f"Centro: {expediente_detallado.id_centro}")
-                                        print(f"Diagnóstico: {expediente_detallado.diagnostico}")
-                                        print(f"Tratamiento: {expediente_detallado.tratamiento}")
-                                        print(f"Observaciones: {expediente_detallado.observaciones}")
-                                        print(f"Referencias: {expediente_detallado.referencia}")
-                                        print(f"Contrarreferencia: {expediente_detallado.contrarreferencia}")
-                                        print(f"Interconsulta: {expediente_detallado.interconsulta}")
-                                        print(f"Enfermería: {expediente_detallado.enfermeria}")
-                                        print(f"Historia clínica: {expediente_detallado.historia_clinica}")
-                                        print(f"Consentimientos: {expediente_detallado.consentimientos}")
-                                        print(f"Hoja de identificación: {expediente_detallado.hoja_identificacion}")
-                                        print(f"Reporte de exámenes: {expediente_detallado.reporte_examenes}")
-                                        print(f"Fecha de creación: {expediente_detallado.fecha_creacion}")
-                                        print(f"Fecha de modificación: {expediente_detallado.fecha_modificacion}")
-                                        print("-" * 60)
+                                        ver_expediente_detallado(expediente_detallado)
                                     except ValueError:
                                         print("Selección inválida.")
                                 else:
