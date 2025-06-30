@@ -32,3 +32,23 @@ class FileManager:
                 return ultimo_id + 1
         except FileNotFoundError:
             return 1
+        
+    def obtener_registros(self, archivo: str) -> List[List[str]]:
+        # obtiene todos los registros de un archivo
+        try:
+            with open(self._obtener_ruta_archivo(archivo), 'r', encoding='utf-8') as f:
+                registros = []
+                for linea in f:
+                    if linea.strip():
+                        registros.append(linea.strip().split(self.separador))
+                return registros
+        except FileNotFoundError:
+            return []
+    
+    def obtener_registro_por_id(self, archivo: str, id_registro: int) -> Optional[List[str]]:
+        # obtiene un registro específico por ID
+        registros = self.obtener_registros(archivo)
+        for registro in registros:
+            if int(registro[0]) == id_registro:
+                return registro
+        return None
