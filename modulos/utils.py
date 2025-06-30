@@ -76,3 +76,35 @@ class FileManager:
             if len(registro) > columna and valor.lower() in registro[columna].lower():
                 resultados.append(registro)
         return resultados
+    
+    def obtener_estadisticas(self) -> Dict[str, int]:
+        # obtiene estadísticas generales del sistema
+        stats = {
+            'total_centros': 0,
+            'total_usuarios': 0,
+            'total_medicos': 0,
+            'total_pacientes': 0,
+            'total_expedientes': 0
+        }
+        try:
+            # contar centros
+            centros = self.obtener_registros('centros')
+            stats['total_centros'] = len(centros)
+            
+            # contar usuarios y clasificar por tipo
+            usuarios = self.obtener_registros('usuarios')
+            stats['total_usuarios'] = len(usuarios)
+            
+            for usuario in usuarios:
+                if len(usuario) >= 5:  # asegurarse de que tiene todos los campos
+                    tipo_usuario = usuario[4]  # el tipo está en la columna 4
+                    if tipo_usuario == 'medico':
+                        stats['total_medicos'] += 1
+                    elif tipo_usuario == 'paciente':
+                        stats['total_pacientes'] += 1
+            # contar expedientes
+            expedientes = self.obtener_registros('expedientes')
+            stats['total_expedientes'] = len(expedientes)
+        except Exception as e:
+            print(f"Error al obtener estadísticas: {e}")
+        return stats
