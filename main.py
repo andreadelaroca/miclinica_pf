@@ -127,15 +127,20 @@ def registrar_usuario(usuario_dao, centro_dao):
         print(f"Error al registrar usuario: {e}")
 
 
-def listar_usuarios(usuario_dao):
-    """Lista todos los usuarios"""
-    usuarios = usuario_dao.obtener_todos_usuarios()
+def listar_usuarios(usuario_dao, usuario_logueado=None):
+    """Lista usuarios (todos o del centro del administrador)"""
+    if usuario_logueado and usuario_logueado.es_administrador():
+        usuarios = usuario_dao.obtener_usuarios_por_centro(usuario_logueado.id_centro)
+        titulo = f"USUARIOS DEL CENTRO {usuario_logueado.id_centro}"
+    else:
+        usuarios = usuario_dao.obtener_todos_usuarios()
+        titulo = "LISTA DE USUARIOS"
     
     if not usuarios:
         print("No hay usuarios registrados.")
         return
     
-    print("\n--- LISTA DE USUARIOS ---")
+    print(f"\n--- {titulo} ---")
     for usuario in usuarios:
         print(f"ID: {usuario.id_usuario} | {usuario.nombre} {usuario.apellido} | {usuario.email} | {usuario.tipo_usuario}")
     print()
@@ -178,17 +183,17 @@ def listar_centros(centro_dao):
         print(f"ID: {centro.id_centro} | {centro.nombre} | {centro.direccion} | {centro.telefono}")
 
 
-def crear_expediente(expediente_dao, usuario_dao, centro_dao):
+def crear_expediente(expediente_dao, usuario_dao, medico_logueado):
     """Crea un nuevo expediente médico"""
     print("\n--- CREAR EXPEDIENTE MÉDICO ---")
     
-    # Mostrar pacientes disponibles
-    pacientes = usuario_dao.obtener_pacientes()
+    # Mostrar pacientes del mismo centro del médico logueado
+    pacientes = usuario_dao.obtener_pacientes_por_centro(medico_logueado.id_centro)
     if not pacientes:
-        print("No hay pacientes registrados.")
+        print("No hay pacientes registrados en su centro.")
         return
     
-    print("\nPacientes disponibles:")
+    print("\nPacientes disponibles en su centro:")
     for paciente in pacientes:
         print(f"ID: {paciente.id_usuario} | {paciente.nombre} {paciente.apellido}")
     
@@ -198,36 +203,9 @@ def crear_expediente(expediente_dao, usuario_dao, centro_dao):
         print("ID inválido.")
         return
     
-    # Mostrar médicos disponibles
-    medicos = usuario_dao.obtener_medicos()
-    if not medicos:
-        print("No hay médicos registrados.")
-        return
-    
-    print("\nMédicos disponibles:")
-    for medico in medicos:
-        print(f"ID: {medico.id_usuario} | {medico.nombre} {medico.apellido}")
-    
-    try:
-        id_medico = int(input("\nID del médico: "))
-    except ValueError:
-        print("ID inválido.")
-        return
-    
-    # Mostrar centros disponibles
-    centros = centro_dao.obtener_todos_centros()
-    if not centros:
-        print("No hay centros registrados.")
-        return
-    
-    print("\nCentros disponibles:")
-    for centro in centros:
-        print(f"ID: {centro.id_centro} | {centro.nombre}")
-    
-    try:
-        id_centro = int(input("\nID del centro: "))
-    except ValueError:
-        print("ID inválido.")
+    # Validar si paciente pertenece al centro
+    if not any(paciente.id_usuario == id_paciente for paciente in pacientes):
+        print("El paciente seleccionado no pertenece a su centro.")
         return
     
     # Datos del expediente
@@ -245,8 +223,8 @@ def crear_expediente(expediente_dao, usuario_dao, centro_dao):
     
     expediente = Expediente(
         id_paciente=id_paciente,
-        id_medico=id_medico,
-        id_centro=id_centro,
+        id_medico=medico_logueado.id_usuario,
+        id_centro=medico_logueado.id_centro,
         diagnostico=diagnostico,
         tratamiento=tratamiento,
         observaciones=observaciones,
@@ -267,6 +245,88 @@ def crear_expediente(expediente_dao, usuario_dao, centro_dao):
         print(f"Error al crear expediente: {e}")
 
 
+def editar_expediente(expediente_dao, medico_logueado):
+    """Edita un expediente médico del médico logueado"""
+    print("\n--- EDITAR EXPEDIENTE MÉDICO ---")
+    
+    # Obtener expedientes del médico logueado
+    expedientes = expediente_dao.obtener_expedientes_por_medico(medico_logueado.id_usuario)
+    if not expedientes:
+        print("No tienes expedientes registrados.")
+        return
+    
+    print("\nTus expedientes:")
+    for i, expediente in enumerate(expedientes, 1):
+        print(f"{i}. ID: {expediente.id_expediente} | Paciente: {expediente.id_paciente} | Diagnóstico: {expediente.diagnostico[:50]}...")
+    
+    try:
+        seleccion = int(input("\nSelecciona el número del expediente a editar: "))
+        if seleccion < 1 or seleccion > len(expedientes):
+            print("Selección inválida.")
+            return
+        
+        expediente = expedientes[seleccion - 1]
+        
+        print(f"\nEditando expediente ID: {expediente.id_expediente}")
+        print("(Presione Enter para mantener el valor actual)")
+        
+        nuevo_diagnostico = input(f"Diagnóstico [{expediente.diagnostico}]: ").strip()
+        if nuevo_diagnostico:
+            expediente.diagnostico = nuevo_diagnostico
+        
+        nuevo_tratamiento = input(f"Tratamiento [{expediente.tratamiento}]: ").strip()
+        if nuevo_tratamiento:
+            expediente.tratamiento = nuevo_tratamiento
+        
+        nuevas_observaciones = input(f"Observaciones [{expediente.observaciones}]: ").strip()
+        if nuevas_observaciones:
+            expediente.observaciones = nuevas_observaciones
+        
+        nueva_referencia = input(f"Referencias [{expediente.referencia}]: ").strip()
+        if nueva_referencia:
+            expediente.referencia = nueva_referencia
+        
+        nueva_contrarreferencia = input(f"Contrarreferencia [{expediente.contrarreferencia}]: ").strip()
+        if nueva_contrarreferencia:
+            expediente.contrarreferencia = nueva_contrarreferencia
+        
+        nueva_interconsulta = input(f"Interconsulta [{expediente.interconsulta}]: ").strip()
+        if nueva_interconsulta:
+            expediente.interconsulta = nueva_interconsulta
+        
+        nueva_enfermeria = input(f"Enfermería [{expediente.enfermeria}]: ").strip()
+        if nueva_enfermeria:
+            expediente.enfermeria = nueva_enfermeria
+        
+        nueva_historia = input(f"Historia clínica [{expediente.historia_clinica}]: ").strip()
+        if nueva_historia:
+            expediente.historia_clinica = nueva_historia
+        
+        nuevos_consentimientos = input(f"Consentimientos [{expediente.consentimientos}]: ").strip()
+        if nuevos_consentimientos:
+            expediente.consentimientos = nuevos_consentimientos
+        
+        nueva_hoja = input(f"Hoja de identificación [{expediente.hoja_identificacion}]: ").strip()
+        if nueva_hoja:
+            expediente.hoja_identificacion = nueva_hoja
+        
+        nuevo_reporte = input(f"Reporte de exámenes [{expediente.reporte_examenes}]: ").strip()
+        if nuevo_reporte:
+            expediente.reporte_examenes = nuevo_reporte
+        
+        expediente.actualizar_fecha_modificacion()
+        
+        if expediente_dao.actualizar_expediente(expediente):
+            print("Expediente actualizado exitosamente.")
+        else:
+            print("Error al actualizar expediente.")
+    
+    except ValueError:
+        print("Selección inválida.")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
 def listar_expedientes(expediente_dao):
     """Lista todos los expedientes"""
     expedientes = expediente_dao.obtener_todos_expedientes()
@@ -285,18 +345,23 @@ def listar_expedientes(expediente_dao):
         print("-" * 50)
 
 
-def editar_usuario(usuario_dao):
-    """Edita un usuario existente"""
+def editar_usuario(usuario_dao, usuario_logueado=None):
+    """Edita un usuario existente (del mismo centro si es administrador)"""
     print("\n--- EDITAR USUARIO ---")
     
-    # Mostrar usuarios disponibles
-    usuarios = usuario_dao.obtener_todos_usuarios()
+    # Obtener usuarios según el tipo de usuario logueado
+    if usuario_logueado and usuario_logueado.es_administrador():
+        usuarios = usuario_dao.obtener_usuarios_por_centro(usuario_logueado.id_centro)
+        titulo = f"USUARIOS DEL CENTRO {usuario_logueado.id_centro}"
+    else:
+        usuarios = usuario_dao.obtener_todos_usuarios()
+        titulo = "USUARIOS DISPONIBLES"
+    
     if not usuarios:
         print("No hay usuarios registrados.")
         return
     
-    print("\nUsuarios disponibles:")
-    print("\nUsuarios disponibles:")
+    print(f"\n{titulo}:")
     for usuario in usuarios:
         print(f"ID: {usuario.id_usuario} | {usuario.nombre} {usuario.apellido} | {usuario.tipo_usuario}")
     
@@ -304,10 +369,15 @@ def editar_usuario(usuario_dao):
         id_usuario = int(input("\nID del usuario a editar: "))
         usuario = usuario_dao.obtener_usuario_por_id(id_usuario)
         
-        # Pésima forma de solucionar el problema, pero hey, funciona!
         if not usuario or id_usuario == 0:
             print("Usuario no encontrado.")
             return
+        
+        # Verificar si el usuario pertenece al centro del administrador
+        if usuario_logueado and usuario_logueado.es_administrador():
+            if usuario.id_centro != usuario_logueado.id_centro:
+                print("No puede editar usuarios de otros centros.")
+                return
         
         print(f"\nEditando usuario: {usuario.nombre} {usuario.apellido}")
         print("(Presione Enter para mantener el valor actual)")
@@ -335,17 +405,23 @@ def editar_usuario(usuario_dao):
         print(f"Error: {e}")
 
 
-def eliminar_usuario(usuario_dao):
-    """Elimina (desactiva) un usuario"""
+def eliminar_usuario(usuario_dao, usuario_logueado=None):
+    """Elimina (desactiva) un usuario (del mismo centro si es administrador)"""
     print("\n--- ELIMINAR USUARIO ---")
     
-    # Mostrar usuarios disponibles
-    usuarios = usuario_dao.obtener_todos_usuarios()
+    # Obtener usuarios según el tipo de usuario logueado
+    if usuario_logueado and usuario_logueado.es_administrador():
+        usuarios = usuario_dao.obtener_usuarios_por_centro(usuario_logueado.id_centro)
+        titulo = f"USUARIOS DEL CENTRO {usuario_logueado.id_centro}"
+    else:
+        usuarios = usuario_dao.obtener_todos_usuarios()
+        titulo = "USUARIOS DISPONIBLES"
+    
     if not usuarios:
         print("No hay usuarios registrados.")
         return
     
-    print("\nUsuarios disponibles:")
+    print(f"\n{titulo}:")
     for usuario in usuarios:
         print(f"ID: {usuario.id_usuario} | {usuario.nombre} {usuario.apellido} | {usuario.tipo_usuario}")
     
@@ -356,6 +432,12 @@ def eliminar_usuario(usuario_dao):
         if not usuario:
             print("Usuario no encontrado.")
             return
+        
+        # Verificar si el usuario pertenece al centro del administrador
+        if usuario_logueado and usuario_logueado.es_administrador():
+            if usuario.id_centro != usuario_logueado.id_centro:
+                print("No puede eliminar usuarios de otros centros.")
+                return
         
         confirmacion = input(f"¿Está seguro de eliminar a {usuario.nombre} {usuario.apellido}? (s/N): ")
         if confirmacion.lower() == 's':
@@ -372,29 +454,18 @@ def eliminar_usuario(usuario_dao):
         print(f"Error: {e}")
 
 
-def editar_centro(centro_dao):
-    """Edita un centro médico existente"""
+def editar_centro(centro_dao, usuario_logueado=None):
+    """Edita un centro médico existente (solo su propio centro si es administrador)"""
     print("\n--- EDITAR CENTRO MÉDICO ---")
     
-    # Mostrar centros disponibles
-    centros = centro_dao.obtener_todos_centros()
-    if not centros:
-        print("No hay centros registrados.")
-        return
-    
-    print("\nCentros disponibles:")
-    for centro in centros:
-        print(f"ID: {centro.id_centro} | {centro.nombre} | {centro.direccion}")
-    
-    try:
-        id_centro = int(input("\nID del centro a editar: "))
-        centro = centro_dao.obtener_centro_por_id(id_centro)
-        
+    if usuario_logueado and usuario_logueado.es_administrador():
+        # Los administradores solo pueden editar su propio centro
+        centro = centro_dao.obtener_centro_por_id(usuario_logueado.id_centro)
         if not centro:
-            print("Centro no encontrado.")
+            print("No se encontró su centro médico.")
             return
         
-        print(f"\nEditando centro: {centro.nombre}")
+        print(f"\nEditando SU centro: {centro.nombre}")
         print("(Presione Enter para mantener el valor actual)")
         
         nuevo_nombre = input(f"Nombre [{centro.nombre}]: ").strip()
@@ -413,11 +484,50 @@ def editar_centro(centro_dao):
             print("Centro actualizado exitosamente.")
         else:
             print("Error al actualizar centro.")
-    
-    except ValueError:
-        print("ID inválido.")
-    except Exception as e:
-        print(f"Error: {e}")
+        
+    else:
+        # Para usuarios no administradores (funcionalidad original)
+        centros = centro_dao.obtener_todos_centros()
+        if not centros:
+            print("No hay centros registrados.")
+            return
+        
+        print("\nCentros disponibles:")
+        for centro in centros:
+            print(f"ID: {centro.id_centro} | {centro.nombre} | {centro.direccion}")
+        
+        try:
+            id_centro = int(input("\nID del centro a editar: "))
+            centro = centro_dao.obtener_centro_por_id(id_centro)
+            
+            if not centro:
+                print("Centro no encontrado.")
+                return
+            
+            print(f"\nEditando centro: {centro.nombre}")
+            print("(Presione Enter para mantener el valor actual)")
+            
+            nuevo_nombre = input(f"Nombre [{centro.nombre}]: ").strip()
+            if nuevo_nombre:
+                centro.nombre = nuevo_nombre
+            
+            nueva_direccion = input(f"Dirección [{centro.direccion}]: ").strip()
+            if nueva_direccion:
+                centro.direccion = nueva_direccion
+            
+            nuevo_telefono = input(f"Teléfono [{centro.telefono}]: ").strip()
+            if nuevo_telefono:
+                centro.telefono = nuevo_telefono
+            
+            if centro_dao.actualizar_centro(centro):
+                print("Centro actualizado exitosamente.")
+            else:
+                print("Error al actualizar centro.")
+        
+        except ValueError:
+            print("ID inválido.")
+        except Exception as e:
+            print(f"Error: {e}")
 
 
 def eliminar_centro(centro_dao):
@@ -457,28 +567,38 @@ def eliminar_centro(centro_dao):
         print(f"Error: {e}")
 
 
-def listar_medicos(usuario_dao):
-    """Lista todos los médicos"""
-    medicos = usuario_dao.obtener_medicos()
+def listar_medicos(usuario_dao, usuario_logueado=None):
+    """Lista médicos (todos o del centro del administrador)"""
+    if usuario_logueado and usuario_logueado.es_administrador():
+        medicos = usuario_dao.obtener_medicos_por_centro(usuario_logueado.id_centro)
+        titulo = f"MÉDICOS DEL CENTRO {usuario_logueado.id_centro}"
+    else:
+        medicos = usuario_dao.obtener_medicos()
+        titulo = "LISTA DE MÉDICOS"
     
     if not medicos:
         print("No hay médicos registrados.")
         return
     
-    print("\n--- LISTA DE MÉDICOS ---")
+    print(f"\n--- {titulo} ---")
     for medico in medicos:
         print(f"ID: {medico.id_usuario} | {medico.nombre} {medico.apellido} | {medico.email}")
 
 
-def listar_pacientes(usuario_dao):
-    """Lista todos los pacientes"""
-    pacientes = usuario_dao.obtener_pacientes()
+def listar_pacientes(usuario_dao, usuario_logueado=None):
+    """Lista pacientes (todos o del centro del administrador)"""
+    if usuario_logueado and usuario_logueado.es_administrador():
+        pacientes = usuario_dao.obtener_pacientes_por_centro(usuario_logueado.id_centro)
+        titulo = f"PACIENTES DEL CENTRO {usuario_logueado.id_centro}"
+    else:
+        pacientes = usuario_dao.obtener_pacientes()
+        titulo = "LISTA DE PACIENTES"
     
     if not pacientes:
         print("No hay pacientes registrados.")
         return
     
-    print("\n--- LISTA DE PACIENTES ---")
+    print(f"\n--- {titulo} ---")
     for paciente in pacientes:
         print(f"ID: {paciente.id_usuario} | {paciente.nombre} {paciente.apellido} | {paciente.email}")
 
@@ -531,8 +651,9 @@ def mostrar_menu_medico():
     print("    MÓDULO MÉDICO")
     print("-"*40)
     print("1. Crear expediente")
-    print("2. Buscar expediente")
-    print("3. Ver expedientes por paciente")
+    print("2. Editar expediente")
+    print("3. Buscar expediente")
+    print("4. Ver expedientes por paciente")
     print("0. Cerrar sesión")
     print("-"*40)
 
@@ -547,17 +668,30 @@ def mostrar_menu_paciente():
     print("-"*40)
 
 
-def mostrar_estadisticas(file_manager):
-    """Muestra estadísticas del sistema"""
-    stats = file_manager.obtener_estadisticas()
+def mostrar_estadisticas(file_manager, usuario_dao, expediente_dao, usuario_logueado):
+    """Muestra estadísticas del centro del usuario logueado"""
     print("\n" + "="*40)
-    print("    ESTADÍSTICAS DEL SISTEMA")
+    print(f"    ESTADÍSTICAS DEL CENTRO {usuario_logueado.id_centro}")
     print("="*40)
-    print(f"Total de Centros Médicos: {stats['total_centros']}")
-    print(f"Total de Usuarios: {stats['total_usuarios']}")
-    print(f"  - Médicos: {stats['total_medicos']}")
-    print(f"  - Pacientes: {stats['total_pacientes']}")
-    print(f"Total de Expedientes: {stats['total_expedientes']}")
+    
+    # Estadísticas específicas del centro
+    usuarios_centro = usuario_dao.obtener_usuarios_por_centro(usuario_logueado.id_centro)
+    medicos_centro = [u for u in usuarios_centro if u.es_medico()]
+    pacientes_centro = [u for u in usuarios_centro if u.es_paciente()]
+    administradores_centro = [u for u in usuarios_centro if u.es_administrador()]
+    
+    # Contar expedientes del centro
+    expedientes_centro = 0
+    todos_expedientes = expediente_dao.obtener_todos_expedientes()
+    for expediente in todos_expedientes:
+        if expediente.id_centro == usuario_logueado.id_centro:
+            expedientes_centro += 1
+    
+    print(f"Total de Usuarios: {len(usuarios_centro)}")
+    print(f"  - Médicos: {len(medicos_centro)}")
+    print(f"  - Pacientes: {len(pacientes_centro)}")
+    print(f"  - Administradores: {len(administradores_centro)}")
+    print(f"Total de Expedientes: {expedientes_centro}")
     print("="*40)
 
 
@@ -673,51 +807,72 @@ def main():
                                 print("Cerrando sesión...")
                                 break
                             elif sub_opcion == "1":
-                                listar_usuarios(usuario_dao)
+                                listar_usuarios(usuario_dao, usuario_logueado)
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "2":
                                 termino = input("Término de búsqueda: ")
                                 usuarios = usuario_dao.buscar_usuarios(termino)
-                                if usuarios:
-                                    print("\n--- RESULTADOS DE BÚSQUEDA ---")
-                                    for usuario in usuarios:
+                                # Filtrar solo usuarios del mismo centro
+                                usuarios_centro = [u for u in usuarios if u.id_centro == usuario_logueado.id_centro]
+                                if usuarios_centro:
+                                    print(f"\n--- RESULTADOS DE BÚSQUEDA (CENTRO {usuario_logueado.id_centro}) ---")
+                                    for usuario in usuarios_centro:
                                         print(f"ID: {usuario.id_usuario} | {usuario.nombre} {usuario.apellido} | {usuario.email} | {usuario.tipo_usuario}")
                                 else:
-                                    print("No se encontraron usuarios.")
+                                    print("No se encontraron usuarios en su centro.")
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "3":
-                                editar_usuario(usuario_dao)
+                                editar_usuario(usuario_dao, usuario_logueado)
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "4":
-                                eliminar_usuario(usuario_dao)
+                                eliminar_usuario(usuario_dao, usuario_logueado)
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "5":
-                                editar_centro(centro_dao)
+                                editar_centro(centro_dao, usuario_logueado)
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "6":
-                                eliminar_centro(centro_dao)
+                                print("Los administradores no pueden eliminar centros médicos.")
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "7":
+                                # Mostrar médicos del centro del administrador
+                                medicos = usuario_dao.obtener_medicos_por_centro(usuario_logueado.id_centro)
+                                if not medicos:
+                                    print("No hay médicos en su centro.")
+                                    input("Presione Enter para continuar...")
+                                    continue
+                                
+                                print(f"\nMédicos en su centro (Centro {usuario_logueado.id_centro}):")
+                                for i, medico in enumerate(medicos, 1):
+                                    print(f"{i}. ID: {medico.id_usuario} | {medico.nombre} {medico.apellido}")
+                                
                                 try:
-                                    id_medico = int(input("ID del médico: "))
-                                    expedientes = expediente_dao.obtener_expedientes_por_medico(id_medico)
+                                    seleccion = int(input("\nSeleccione el número del médico (0 para volver): "))
+                                    if seleccion == 0:
+                                        continue
+                                    if seleccion < 1 or seleccion > len(medicos):
+                                        print("Selección inválida.")
+                                        input("Presione Enter para continuar...")
+                                        continue
+                                    
+                                    medico_seleccionado = medicos[seleccion - 1]
+                                    expedientes = expediente_dao.obtener_expedientes_por_medico(medico_seleccionado.id_usuario)
                                     if expedientes:
-                                        print(f"\n--- EXPEDIENTES DEL MÉDICO {id_medico} ---")
+                                        print(f"\n--- EXPEDIENTES DEL DR. {medico_seleccionado.nombre} {medico_seleccionado.apellido} ---")
                                         for expediente in expedientes:
                                             print(f"ID: {expediente.id_expediente} | Paciente: {expediente.id_paciente} | Diagnóstico: {expediente.diagnostico}")
                                     else:
-                                        print("No se encontraron expedientes para este médico.")
+                                        print("Este médico no tiene expedientes registrados.")
                                 except ValueError:
-                                    print("ID inválido.")
+                                    print("Selección inválida.")
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "8":
-                                listar_medicos(usuario_dao)
+                                listar_medicos(usuario_dao, usuario_logueado)
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "9":
-                                listar_pacientes(usuario_dao)
+                                listar_pacientes(usuario_dao, usuario_logueado)
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "10":
-                                mostrar_estadisticas(file_manager)
+                                mostrar_estadisticas(file_manager, usuario_dao, expediente_dao, usuario_logueado)
                                 input("Presione Enter para continuar...")
                             else:
                                 print("Opción no válida.")
@@ -731,9 +886,12 @@ def main():
                                 print("Cerrando sesión...")
                                 break
                             elif sub_opcion == "1":
-                                crear_expediente(expediente_dao, usuario_dao, centro_dao)
+                                crear_expediente(expediente_dao, usuario_dao, usuario_logueado)
                                 input("Presione Enter para continuar...")
                             elif sub_opcion == "2":
+                                editar_expediente(expediente_dao, usuario_logueado)
+                                input("Presione Enter para continuar...")
+                            elif sub_opcion == "3":
                                 termino = input("Término de búsqueda: ")
                                 expedientes = expediente_dao.buscar_expedientes(termino)
                                 if expedientes:
@@ -743,18 +901,37 @@ def main():
                                 else:
                                     print("No se encontraron expedientes.")
                                 input("Presione Enter para continuar...")
-                            elif sub_opcion == "3":
+                            elif sub_opcion == "4":
+                                # Mostrar pacientes del centro del médico
+                                pacientes = usuario_dao.obtener_pacientes_por_centro(usuario_logueado.id_centro)
+                                if not pacientes:
+                                    print("No hay pacientes en su centro.")
+                                    input("Presione Enter para continuar...")
+                                    continue
+                                
+                                print("\nPacientes en su centro:")
+                                for i, paciente in enumerate(pacientes, 1):
+                                    print(f"{i}. ID: {paciente.id_usuario} | {paciente.nombre} {paciente.apellido}")
+                                
                                 try:
-                                    id_paciente = int(input("ID del paciente: "))
-                                    expedientes = expediente_dao.obtener_expedientes_por_paciente(id_paciente)
+                                    seleccion = int(input("\nSeleccione el número del paciente (0 para volver): "))
+                                    if seleccion == 0:
+                                        continue
+                                    if seleccion < 1 or seleccion > len(pacientes):
+                                        print("Selección inválida.")
+                                        input("Presione Enter para continuar...")
+                                        continue
+                                    
+                                    paciente_seleccionado = pacientes[seleccion - 1]
+                                    expedientes = expediente_dao.obtener_expedientes_por_paciente(paciente_seleccionado.id_usuario)
                                     if expedientes:
-                                        print(f"\n--- EXPEDIENTES DEL PACIENTE {id_paciente} ---")
+                                        print(f"\n--- EXPEDIENTES DE {paciente_seleccionado.nombre} {paciente_seleccionado.apellido} ---")
                                         for expediente in expedientes:
                                             print(f"ID: {expediente.id_expediente} | Médico: {expediente.id_medico} | Diagnóstico: {expediente.diagnostico}")
                                     else:
-                                        print("No se encontraron expedientes para este paciente.")
+                                        print("Este paciente no tiene expedientes registrados.")
                                 except ValueError:
-                                    print("ID inválido.")
+                                    print("Selección inválida.")
                                 input("Presione Enter para continuar...")
                             else:
                                 print("Opción no válida.")
@@ -771,11 +948,39 @@ def main():
                                 expedientes = expediente_dao.obtener_expedientes_por_paciente(usuario_logueado.id_usuario)
                                 if expedientes:
                                     print(f"\n--- MIS EXPEDIENTES ---")
-                                    for expediente in expedientes:
-                                        print(f"ID: {expediente.id_expediente} | Médico: {expediente.id_medico} | Diagnóstico: {expediente.diagnostico}")
-                                        print(f"   Tratamiento: {expediente.tratamiento}")
+                                    for i, expediente in enumerate(expedientes, 1):
+                                        print(f"{i}. ID: {expediente.id_expediente} | Médico: {expediente.id_medico} | Diagnóstico: {expediente.diagnostico[:50]}...")
                                         print(f"   Fecha: {expediente.fecha_creacion}")
-                                        print("-" * 50)
+                                    
+                                    try:
+                                        seleccion = int(input("\nSeleccione el número del expediente para ver detalles (0 para volver): "))
+                                        if seleccion == 0:
+                                            continue
+                                        if seleccion < 1 or seleccion > len(expedientes):
+                                            print("Selección inválida.")
+                                            input("Presione Enter para continuar...")
+                                            continue
+                                        
+                                        expediente_detallado = expedientes[seleccion - 1]
+                                        print(f"\n--- DETALLES DEL EXPEDIENTE {expediente_detallado.id_expediente} ---")
+                                        print(f"Médico: {expediente_detallado.id_medico}")
+                                        print(f"Centro: {expediente_detallado.id_centro}")
+                                        print(f"Diagnóstico: {expediente_detallado.diagnostico}")
+                                        print(f"Tratamiento: {expediente_detallado.tratamiento}")
+                                        print(f"Observaciones: {expediente_detallado.observaciones}")
+                                        print(f"Referencias: {expediente_detallado.referencia}")
+                                        print(f"Contrarreferencia: {expediente_detallado.contrarreferencia}")
+                                        print(f"Interconsulta: {expediente_detallado.interconsulta}")
+                                        print(f"Enfermería: {expediente_detallado.enfermeria}")
+                                        print(f"Historia clínica: {expediente_detallado.historia_clinica}")
+                                        print(f"Consentimientos: {expediente_detallado.consentimientos}")
+                                        print(f"Hoja de identificación: {expediente_detallado.hoja_identificacion}")
+                                        print(f"Reporte de exámenes: {expediente_detallado.reporte_examenes}")
+                                        print(f"Fecha de creación: {expediente_detallado.fecha_creacion}")
+                                        print(f"Fecha de modificación: {expediente_detallado.fecha_modificacion}")
+                                        print("-" * 60)
+                                    except ValueError:
+                                        print("Selección inválida.")
                                 else:
                                     print("No tienes expedientes registrados.")
                                 input("Presione Enter para continuar...")
