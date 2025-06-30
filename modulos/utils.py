@@ -67,3 +67,12 @@ class FileManager:
                 for registro in registros:
                     f.write(self.separador.join(registro) + "\n")
         return encontrado
+    
+    def buscar_registros(self, archivo: str, columna: int, valor: str) -> List[List[str]]:
+        # busca registros por valor en una columna específica
+        registros = self.obtener_registros(archivo)
+        resultados = []
+        for registro in registros:
+            if len(registro) > columna and valor.lower() in registro[columna].lower():
+                resultados.append(registro)
+        return resultados
