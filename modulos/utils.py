@@ -52,3 +52,18 @@ class FileManager:
             if int(registro[0]) == id_registro:
                 return registro
         return None
+    
+    def actualizar_registro(self, archivo: str, id_registro: int, nuevos_datos: List[str]) -> bool:
+        # actualiza un registro existente
+        registros = self.obtener_registros(archivo)
+        encontrado = False
+        for i, registro in enumerate(registros):
+            if int(registro[0]) == id_registro:
+                registros[i] = [str(id_registro)] + nuevos_datos
+                encontrado = True
+                break
+        if encontrado:
+            with open(self._obtener_ruta_archivo(archivo), 'w', encoding='utf-8') as f:
+                for registro in registros:
+                    f.write(self.separador.join(registro) + "\n")
+        return encontrado
