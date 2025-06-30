@@ -100,6 +100,38 @@ class FileManager:
         return resultados
 
 
+    def obtener_estadisticas(self) -> Dict[str, int]:
+        """Obtiene estadísticas básicas del sistema"""
+        stats = {
+            'total_centros': 0,
+            'total_usuarios': 0,
+            'total_medicos': 0,
+            'total_pacientes': 0,
+            'total_expedientes': 0
+        }
+        
+        # Contar centros
+        centros = self.obtener_registros('centros')
+        stats['total_centros'] = len([c for c in centros if len(c) > 4 and c[4].lower() == 'true'])
+        
+        # Contar usuarios por tipo
+        usuarios = self.obtener_registros('usuarios')
+        for usuario in usuarios:
+            if len(usuario) > 7 and usuario[7].lower() == 'true':  # activo
+                stats['total_usuarios'] += 1
+                if len(usuario) > 4:
+                    if usuario[4] == 'medico':
+                        stats['total_medicos'] += 1
+                    elif usuario[4] == 'paciente':
+                        stats['total_pacientes'] += 1
+        
+        # Contar expedientes
+        expedientes = self.obtener_registros('expedientes')
+        stats['total_expedientes'] = len([e for e in expedientes if len(e) > 15 and e[15].lower() == 'true'])
+        
+        return stats
+
+
 def obtener_fecha_actual() -> str:
     """Devuelve la fecha actual en formato string"""
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
