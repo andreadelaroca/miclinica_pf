@@ -108,3 +108,7 @@ class FileManager:
         except Exception as e:
             print(f"Error al obtener estadísticas: {e}")
         return stats
+
+    def obtener_fecha_actual() -> str:
+        # devuelve la fecha actual en formato string
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
