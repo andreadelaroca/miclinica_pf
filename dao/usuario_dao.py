@@ -106,9 +106,10 @@ class UsuarioDAO:
             usuario.activo = False
             return self.actualizar_usuario(usuario)
         return False
-    
+   
+"""
     def buscar_usuarios(self, termino: str) -> List[Usuario]:
-        """Busca usuarios por nombre, apellido o email"""
+        # Busca usuarios por nombre, apellido o email
         usuarios_encontrados = []
         ids_encontrados = set()  # Para evitar duplicados
         
@@ -137,4 +138,4 @@ class UsuarioDAO:
                 ids_encontrados.add(usuario.id_usuario)
         
         return usuarios_encontrados
-
+"""
