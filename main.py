@@ -61,12 +61,6 @@ def manejar_modulo_centros(centro_dao):
         elif sub_opcion == "3":
             buscar_centro(centro_dao)
             input("Presione Enter para continuar...")
-        elif sub_opcion == "4":
-            editar_centro(centro_dao)
-            input("Presione Enter para continuar...")
-        elif sub_opcion == "5":
-            eliminar_centro(centro_dao)
-            input("Presione Enter para continuar...")
         else:
             print("Opción no válida.")
             input("Presione Enter para continuar...")

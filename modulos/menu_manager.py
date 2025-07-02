@@ -42,8 +42,6 @@ def mostrar_menu_centros():
     print("1. Registrar Centro Médico")
     print("2. Listar Centros")
     print("3. Buscar Centro")
-    print("4. Editar Centro")
-    print("5. Eliminar Centro")
     print("0. Volver al menú principal")
     print("-"*40)
 
