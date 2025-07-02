@@ -188,23 +188,25 @@ def eliminar_usuario(usuario_dao, usuario_logueado=None):
 
 def buscar_usuario(usuario_dao, usuario_logueado=None):
     """Busca usuarios por término"""
-    termino = input("Término de búsqueda: ")
-    usuarios = usuario_dao.buscar_usuarios(termino)
+    termino = input("Ingrese la ID del usuario: ")
+    try:
+        usuario = usuario_dao.obtener_usuario_por_id(int(termino))
+    except TypeError:
+        print("ERROR: La ID introducida no es válida")
+        return
     
     # Filtrar solo usuarios del mismo centro si es administrador
     if usuario_logueado and usuario_logueado.es_administrador():
-        usuarios_centro = [u for u in usuarios if u.id_centro == usuario_logueado.id_centro]
-        if usuarios_centro:
+        if usuario.id_centro == usuario_logueado.id_centro:
             print(f"\n--- RESULTADOS DE BÚSQUEDA (CENTRO {usuario_logueado.id_centro}) ---")
-            for usuario in usuarios_centro:
-                print(f"ID: {usuario.id_usuario} | {usuario.nombre} {usuario.apellido} | {usuario.email} | {usuario.tipo_usuario}")
+            print(f"ID: {usuario.id_usuario} | {usuario.nombre} {usuario.apellido} | {usuario.email} | {usuario.tipo_usuario}")
         else:
             print("No se encontraron usuarios en su centro.")
     else:
-        if usuarios:
+        if usuario:
             print("\n--- RESULTADOS DE BÚSQUEDA ---")
-            for usuario in usuarios:
-                print(f"ID: {usuario.id_usuario} | {usuario.nombre} {usuario.apellido} | {usuario.email} | {usuario.tipo_usuario}")
+            
+            print(f"ID: {usuario.id_usuario} | {usuario.nombre} {usuario.apellido} | {usuario.email} | {usuario.tipo_usuario}")
         else:
             print("No se encontraron usuarios.")
 
