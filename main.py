@@ -230,7 +230,7 @@ def main():
             opcion = input("\nSeleccione una opción: ").strip()
             
             if opcion == "0":
-                print("\n¡Gracias por usar el Sistema de Gestión de Clínica Médica!")
+                print("\n¡Gracias por usar el Sistema!")
                 break
             elif opcion == "1":
                 manejar_modulo_centros(centro_dao)

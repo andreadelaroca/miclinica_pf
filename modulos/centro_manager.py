@@ -46,7 +46,7 @@ def listar_centros(centro_dao):
 
 def buscar_centro(centro_dao):
     """Busca centros por término"""
-    termino = input("Término de búsqueda: ")
+    termino = input("Nombre del centro a buscar: ")
     centros = centro_dao.buscar_centros(termino)
     if centros:
         print("\n--- RESULTADOS DE BÚSQUEDA ---")
