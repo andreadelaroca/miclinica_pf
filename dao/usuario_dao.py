@@ -107,35 +107,3 @@ class UsuarioDAO:
             return self.actualizar_usuario(usuario)
         return False
    
-"""
-    def buscar_usuarios(self, termino: str) -> List[Usuario]:
-        # Busca usuarios por nombre, apellido o email
-        usuarios_encontrados = []
-        ids_encontrados = set()  # Para evitar duplicados
-        
-        # Buscar por nombre
-        registros = self.file_manager.buscar_registros(self.archivo, 1, termino)
-        for registro in registros:
-            usuario = Usuario.from_list(registro)
-            if usuario and usuario.activo and usuario.id_usuario not in ids_encontrados:
-                usuarios_encontrados.append(usuario)
-                ids_encontrados.add(usuario.id_usuario)
-        
-        # Buscar por apellido
-        registros = self.file_manager.buscar_registros(self.archivo, 2, termino)
-        for registro in registros:
-            usuario = Usuario.from_list(registro)
-            if usuario and usuario.activo and usuario.id_usuario not in ids_encontrados:
-                usuarios_encontrados.append(usuario)
-                ids_encontrados.add(usuario.id_usuario)
-        
-        # Buscar por email
-        registros = self.file_manager.buscar_registros(self.archivo, 3, termino)
-        for registro in registros:
-            usuario = Usuario.from_list(registro)
-            if usuario and usuario.activo and usuario.id_usuario not in ids_encontrados:
-                usuarios_encontrados.append(usuario)
-                ids_encontrados.add(usuario.id_usuario)
-        
-        return usuarios_encontrados
-"""
