@@ -27,13 +27,7 @@ def mostrar_menu_usuarios():
     print("-"*40)
     print("1. Registrar Usuario")
     print("2. Listar Usuarios")
-<<<<<<< HEAD
     print("3. Buscar Usuario") 
-    print("4. Editar Usuario") 
-    print("5. Eliminar Usuario")
-=======
-    print("3. Buscar Usuario")
->>>>>>> f2c65808598ff72dc24eb8f9e1870288cf9b06b0
     print("0. Volver al menú principal")
     print("-"*40)
 
