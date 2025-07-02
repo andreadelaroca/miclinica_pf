@@ -61,12 +61,6 @@ def manejar_modulo_centros(centro_dao):
         elif sub_opcion == "3":
             buscar_centro(centro_dao)
             input("Presione Enter para continuar...")
-        elif sub_opcion == "4":
-            editar_centro(centro_dao)
-            input("Presione Enter para continuar...")
-        elif sub_opcion == "5":
-            eliminar_centro(centro_dao)
-            input("Presione Enter para continuar...")
         else:
             print("Opción no válida.")
             input("Presione Enter para continuar...")
@@ -90,12 +84,6 @@ def manejar_modulo_usuarios(usuario_dao, centro_dao):
         elif sub_opcion == "3":
             buscar_usuario(usuario_dao)
             input("Presione Enter para continuar...")
-        elif sub_opcion == "4":
-            editar_usuario(usuario_dao)
-            input("Presione Enter para continuar...")
-        elif sub_opcion == "5":
-            eliminar_usuario(usuario_dao)
-            input("Presione Enter para continuar...")
         else:
             print("Opción no válida.")
             input("Presione Enter para continuar...")
@@ -118,27 +106,21 @@ def manejar_sesion_administrador(usuario_dao, centro_dao, expediente_dao, file_m
             buscar_usuario(usuario_dao, usuario_logueado)
             input("Presione Enter para continuar...")
         elif sub_opcion == "3":
-            editar_usuario(usuario_dao, usuario_logueado)
-            input("Presione Enter para continuar...")
-        elif sub_opcion == "4":
             eliminar_usuario(usuario_dao, usuario_logueado)
             input("Presione Enter para continuar...")
-        elif sub_opcion == "5":
-            editar_centro(centro_dao, usuario_logueado)
-            input("Presione Enter para continuar...")
-        elif sub_opcion == "6":
+        elif sub_opcion == "4":
             print("Los administradores no pueden eliminar centros médicos.")
             input("Presione Enter para continuar...")
-        elif sub_opcion == "7":
+        elif sub_opcion == "5":
             ver_expedientes_por_medico(expediente_dao, usuario_dao, usuario_logueado)
             input("Presione Enter para continuar...")
-        elif sub_opcion == "8":
+        elif sub_opcion == "6":
             listar_medicos(usuario_dao, usuario_logueado)
             input("Presione Enter para continuar...")
-        elif sub_opcion == "9":
+        elif sub_opcion == "7":
             listar_pacientes(usuario_dao, usuario_logueado)
             input("Presione Enter para continuar...")
-        elif sub_opcion == "10":
+        elif sub_opcion == "8":
             mostrar_estadisticas(file_manager, usuario_dao, expediente_dao, usuario_logueado)
             input("Presione Enter para continuar...")
         else:
@@ -160,12 +142,9 @@ def manejar_sesion_medico(usuario_dao, expediente_dao, usuario_logueado):
             crear_expediente(expediente_dao, usuario_dao, usuario_logueado)
             input("Presione Enter para continuar...")
         elif sub_opcion == "2":
-            editar_expediente(expediente_dao, usuario_logueado)
-            input("Presione Enter para continuar...")
-        elif sub_opcion == "3":
             buscar_expediente(expediente_dao)
             input("Presione Enter para continuar...")
-        elif sub_opcion == "4":
+        elif sub_opcion == "3":
             ver_expedientes_por_paciente(expediente_dao, usuario_dao, usuario_logueado)
             input("Presione Enter para continuar...")
         else:

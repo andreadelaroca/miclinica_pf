@@ -27,9 +27,13 @@ def mostrar_menu_usuarios():
     print("-"*40)
     print("1. Registrar Usuario")
     print("2. Listar Usuarios")
+<<<<<<< HEAD
     print("3. Buscar Usuario") 
     print("4. Editar Usuario") 
     print("5. Eliminar Usuario")
+=======
+    print("3. Buscar Usuario")
+>>>>>>> f2c65808598ff72dc24eb8f9e1870288cf9b06b0
     print("0. Volver al menú principal")
     print("-"*40)
 
@@ -42,8 +46,6 @@ def mostrar_menu_centros():
     print("1. Registrar Centro Médico")
     print("2. Listar Centros")
     print("3. Buscar Centro")
-    print("4. Editar Centro")
-    print("5. Eliminar Centro")
     print("0. Volver al menú principal")
     print("-"*40)
 
@@ -72,14 +74,12 @@ def mostrar_menu_administrador():
     print("-"*40)
     print("1. Visualizar usuarios")
     print("2. Buscar usuario")
-    print("3. Editar usuario")
-    print("4. Archivar usuario")
-    print("5. Editar centro médico")
-    print("6. Archivar centro médico")
-    print("7. Ver expedientes por médico")
-    print("8. Listar médicos")
-    print("9. Listar pacientes")
-    print("10. Reportes y estadísticas")
+    print("3. Archivar usuario")
+    print("4. Archivar centro médico")
+    print("5. Ver expedientes por médico")
+    print("6. Listar médicos")
+    print("7. Listar pacientes")
+    print("8. Reportes y estadísticas")
     print("0. Cerrar sesión")
     print("-"*40)
 
@@ -90,9 +90,8 @@ def mostrar_menu_medico():
     print("    MÓDULO MÉDICO")
     print("-"*40)
     print("1. Crear expediente")
-    print("2. Editar expediente")
-    print("3. Buscar expediente")
-    print("4. Ver expedientes por paciente")
+    print("2. Buscar expediente")
+    print("3. Ver expedientes por paciente")
     print("0. Cerrar sesión")
     print("-"*40)
 
